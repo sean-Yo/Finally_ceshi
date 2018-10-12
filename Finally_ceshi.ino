@@ -1,18 +1,10 @@
-/////////////////////
-/*
-  GY33----MINI
-  VCC----VCC
-  GND----GND
-  1:RX---TX,send A5 01 A6 to GY-33
-  2:TX---RX
-  3:MINI_TX---FT232_RX
-*/
-//////////////////
 #include<Wire.h>
-#include <SoftwareSerial.h>
+#include <SoftwareSerial.h>//颜色传感器使用软串口
 SoftwareSerial mySerial(A8,A9); // RX, TX
+
 volatile int sure=0,s,x,k,value1,value2,area,color;
 volatile uint8_t s_h,s_l,x_h,x_l,k_h,k_l;
+//颜色传感器
 unsigned char Re_buf[11], counter = 0;
 unsigned char sign = 0;
 byte rgb[3] = {0};
@@ -24,9 +16,9 @@ float JG_B[5];
 #define switch1 3 
 #define switch2 4
 void setup() {
-    Wire.begin(8);
+  Wire.begin(8);
   Serial.begin(9600);
- // Serial.print("hello");
+  // Serial.print("hello");
   mySerial.begin(9600);
   delay(1);
   mySerial.write(0XA5);
@@ -39,7 +31,7 @@ void setup() {
   //光电对管
   pinMode(switch1,INPUT);
   pinMode(switch2,INPUT);
-    Wire.onReceive(receive);
+  Wire.onReceive(receive);
   Wire.onRequest(request);
 }
 
@@ -78,22 +70,22 @@ void loop() {
     }
   }
 area=rgb[0]*rgb[0]+rgb[1]*rgb[1]+rgb[2]*rgb[2];
-if(area>13143&&area<14143)
+if(area>13143  &&  area<14143)
 {
  color=1;//red
   
 }
-if(area>18174&&area<19174)
+if(area>18174  &&  area<19174)
 {
   color=2;
   //blue
 }
-if(area>8710&&area<9710)
+if(area>8710  &&  area<9710)
 {
   color=3;
   //绿色
 }
-if(area>15569&&area<16569)
+if(area>15569  &&  area<16569)
 {
   color=4;//黄色
 }
@@ -148,7 +140,7 @@ void request()
   Wire.write(k_l);
   Wire.write(value1);
   Wire.write(value2);
-  Wire.write(color);
+  Wire.write(color);//传回颜色值
 }
 
 void receive()
