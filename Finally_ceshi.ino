@@ -1,8 +1,8 @@
 #include<Wire.h>
 #include <SoftwareSerial.h>//颜色传感器使用软串口
-SoftwareSerial mySerial(A8,A9); // RX, TX
+ SoftwareSerial mySerial(A8,A9); // RX, TX
 
-volatile int sure=0,s,x,k,value1,value2,area,color;
+volatile int sure=0,s,x,k,value1,value2,area,color,H;
 volatile uint8_t s_h,s_l,x_h,x_l,k_h,k_l;
 //颜色传感器
 unsigned char Re_buf[11], counter = 0;
@@ -15,6 +15,8 @@ float JG_B[5];
 //光电对管
 #define switch1 3 
 #define switch2 4
+
+
 void setup() {
   Wire.begin(8);
   Serial.begin(9600);
@@ -69,23 +71,22 @@ void loop() {
       sign = 1;
     }
   }
-area=rgb[0]*rgb[0]+rgb[1]*rgb[1]+rgb[2]*rgb[2];
-if(area>13143  &&  area<14143)
+if(RGB_H_R()==2)
 {
  color=1;//red
   
 }
-if(area>18174  &&  area<19174)
+if(RGB_H_R()==201)
 {
   color=2;
   //blue
 }
-if(area>8710  &&  area<9710)
+if(RGB_H_R()==155)
 {
   color=3;
   //绿色
 }
-if(area>15569  &&  area<16569)
+if(RGB_H_R()==22)
 {
   color=4;//黄色
 }
@@ -127,6 +128,32 @@ Serial.print(color);
     value2=digitalRead(switch2);
     Serial.print(value1);
     Serial.println(value2);
+    Serial.println(RGB_H_R());
+}
+u16 RGB_H_R()
+{
+  float RGB_min, RGB_max;
+  float R,G,B;
+  
+      R=rgb[0];
+      G=rgb[1];
+      B=rgb[2];
+
+RGB_max=(R>G?R:G)>B?(R>G?R:G):B;
+RGB_min=(R<G?R:G)<B?(R<G?R:G):B;
+  
+      if(R==RGB_max)   
+      H = (G-B)/(RGB_max-RGB_min);
+      if (G==RGB_max) 
+      H = 2 + (B-R)/(RGB_max-RGB_min);
+      if (B==RGB_max)  
+      H = 4 + (R-G)/(RGB_max-RGB_min);
+      H = H * 60;
+      if (H<0)
+      H = H + 360;
+      if(R>=240&&G>=240&&B>=240)
+       H=400;
+      return H;
 }
 void request()
 {
